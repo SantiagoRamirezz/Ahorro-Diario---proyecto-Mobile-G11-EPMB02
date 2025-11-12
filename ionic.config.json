@@ -1,0 +1,7 @@
+{
+  "name": "ahorro-diario",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
