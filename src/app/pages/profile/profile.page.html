@@ -1,17 +1,56 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Perfil
-    </ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="openProfileModal()">
+        <ion-icon name="person-circle-outline" color="primary"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Perfil</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <app-explore-container name="Profile page"></app-explore-container>
+  <!-- Mensaje de Bienvenida -->
+  <div [hidden]="!userName" class="welcome-message">
+    <h2>Bienvenido, {{ userName }}!</h2>
+  </div>
+
+  <form [formGroup]="profileForm" class="form-container">
+    <ion-item>
+      <ion-input label="Nombre del presupuesto" labelPlacement="floating" formControlName="nameBudget">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input label="Presupuesto mensual" labelPlacement="floating" formControlName="amount" inputmode="numeric"
+        (ionInput)="formatCurrency($event)" type="text" clearInput>
+      </ion-input>
+    </ion-item>
+
+    <ion-button expand="block" type="button" (click)="saveBudget()" [disabled]="profileForm.invalid">
+      Guardar Presupuesto
+    </ion-button>
+
+  </form>
+
+  @if (budgets.length > 0) {
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Presupuestos creados</ion-label>
+    </ion-list-header>
+
+    @for (b of budgets; track b.name) {
+    <ion-item>
+      <ion-label>
+        <h3>{{ b.name }}</h3>
+        <p>{{ b.formattedAmount }}</p>
+      </ion-label>
+    </ion-item>
+    }
+
+  </ion-list>
+  }
+
+
 </ion-content>
