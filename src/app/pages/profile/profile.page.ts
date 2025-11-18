@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
 import { UtilsService } from 'src/app/services/utils.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Router } from '@angular/router';
+import { EnvironmentPage } from '../environment/environment.page';
 
 @Component({
   selector: 'app-profile',
@@ -67,7 +68,7 @@ export class ProfilePage implements OnInit {
   private router = inject(Router)
 
   async ngOnInit() {
-    addIcons({ personCircleOutline })
+    addIcons({ personCircleOutline, settingsOutline });
     this.profileForm = this.fb.group({
       nameBudget: ['', Validators.required],
       income: ['', [Validators.required, Validators.min(1)]],
@@ -190,7 +191,7 @@ export class ProfilePage implements OnInit {
   return sav <= inc;
 }
 
-  // -------- Open modal --------
+  // -------- Open profile modal --------
   async openProfileModal() {
     const modal = await this.modalController.create({
       component: ProfileModalComponent
@@ -207,6 +208,14 @@ export class ProfilePage implements OnInit {
       state.user.name = data;
       await this.storageSvc.setAppState(state);
     }
+  }
+
+  async openEnvironmentModal() {
+    const modal = await this.modalController.create({
+      component: EnvironmentPage
+    });
+
+    await modal.present();
   }
 
   toggleCategory(value: string) {
