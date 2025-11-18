@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ModalController, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonInput } from '@ionic/angular/standalone';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/profile.service';
@@ -24,12 +24,10 @@ export class ProfileModalComponent implements OnInit {
 
     form!: FormGroup;
 
-    constructor(
-        private fb: FormBuilder,
-        private modalCtrl: ModalController,
-        private profileService: ProfileService,
-        private toastCtrl: ToastController,
-    ) { }
+    private fb = inject(FormBuilder)
+    private modalCtrl = inject(ModalController)
+    private profileService = inject(ProfileService)
+    private toastCtrl = inject(ToastController)
 
     async ngOnInit() {
         this.form = this.fb.group({

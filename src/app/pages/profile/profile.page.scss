@@ -1,1 +1,41 @@
 
+.wizard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.landing-title { font-weight: 700; margin-bottom: 12px; }
+.wizard { min-height: 100%; display: flex; flex-direction: column; }
+.wizard-body { margin-top: 12px; flex: 1; }
+.step { display: flex; flex-direction: column; gap: 16px; }
+.year-nav { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.year { font-weight: 700; font-size: 20px; }
+.months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 12px; }
+.month-chip { --background: var(--ion-color-step-100); }
+.hint { display: flex; gap: 8px; align-items: flex-start; background: var(--ion-color-step-50); border-radius: 10px; padding: 12px; margin-top: 12px; }
+.hint .material-icons { color: var(--ion-color-primary); }
+.totals .row { display: flex; justify-content: space-between; padding: 12px; background: var(--ion-color-step-50); border-radius: 10px; }
+.totals .label { color: var(--ion-color-medium); }
+.totals .value { font-weight: 700; }
+.saving { margin-top: 8px; color: var(--ion-color-medium); }
+.categories-section .header { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+.categories-section .empty { display: flex; gap: 8px; align-items: center; background: var(--ion-color-step-50); border-radius: 10px; padding: 12px; }
+.wizard-footer { position: sticky; bottom: 0; padding-top: 8px; background: var(--ion-background-color); padding-bottom: var(--ion-safe-area-bottom); }
+.step-text { color: var(--ion-color-medium); }
+.progress { height: 6px; background: var(--ion-color-step-100); border-radius: 6px; overflow: hidden; }
+.bar { height: 100%; background: #ffcc00; }
+.cat-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--ion-color-step-50); display: flex; align-items: center; justify-content: center; margin-right: 8px; color: var(--ion-color-primary); }
+.modal-actions { padding: 12px; }
+
+.wizard-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+@media (min-width: 480px) {
+  .months { grid-template-columns: repeat(4, 1fr); }
+}

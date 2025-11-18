@@ -13,5 +13,84 @@
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Summary page"></app-explore-container>
+  <!-- <ion-item>
+    <ion-label>Mostrando: {{ monthLabel }}</ion-label>
+  </ion-item> -->
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ budgetLabel }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div><strong>Capital del mes:</strong> {{ budgetCapital | number:'1.0-0' }}</div>
+      <div><strong>Ahorro del mes:</strong> {{ budgetSaving | number:'1.0-0' }}</div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Saldos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div style="display:flex; gap:16px">
+        <div>
+          <div><strong>Ingresos:</strong> {{ income | number:'1.0-0' }}</div>
+          <div><strong>Gastos:</strong> {{ expense | number:'1.0-0' }}</div>
+        </div>
+        <div style="margin-left:auto"><strong>Saldo:</strong> {{ balance | number:'1.0-0' }}</div>
+      </div>
+      <div style="margin-top:8px">
+        <ion-chip [color]="balance < 0 ? 'danger' : 'success'">
+          <ion-label>Saldo disponible: {{ balance | number:'1.0-0' }}</ion-label>
+        </ion-chip>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Gastos por categoría</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div style="width:220px;height:220px;border-radius:50%;margin:auto" [style]="pieStyle"></div>
+      <div style="margin-top:12px">
+        <div *ngFor="let kv of (expenseByCategory | keyvalue)">
+          <span>{{ kv.key }}</span>
+          <span style="float:right">{{ kv.value | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Transacciones del mes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div>
+        <ion-item *ngFor="let t of monthTransactions">
+          <ion-label>
+            <h3>{{ t.type === 'income' ? 'Ingreso' : 'Gasto' }} - {{ t.category }}</h3>
+            <p>{{ t.note }}</p>
+            <small>{{ t.date | date:'mediumDate' }}</small>
+          </ion-label>
+          <ion-label slot="end" [color]="t.type === 'income' ? 'success' : 'danger'">
+            {{ t.type === 'income' ? '+' : '-' }}{{ t.amount | number:'1.0-0' }}
+          </ion-label>
+        </ion-item>
+      </div>
+      <!-- <ion-item>
+        <ion-label position="stacked">Cambiar mes</ion-label>
+        <ion-datetime presentation="month-year" (ionChange)="onMonthChange($event)"></ion-datetime>
+      </ion-item> -->
+    </ion-card-content>
+  </ion-card>
+
+  <ion-fab horizontal="end" vertical="bottom" slot="fixed">
+    <ion-fab-button (click)="goToNewTransaction()">
+      <ion-icon name="add-circle"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
