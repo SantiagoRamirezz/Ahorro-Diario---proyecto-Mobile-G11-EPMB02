@@ -12,6 +12,35 @@
       <ion-title size="large">Resumen</ion-title>
     </ion-toolbar>
   </ion-header>
+  <ion-card [color]="percentage >= 80 ? 'warning' : 'primary'">
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="warning" *ngIf="percentage >= 80"></ion-icon>
+        Estado del Presupuesto
+      </ion-card-title>
+    </ion-card-header>
 
+    <ion-card-content>
+      <div class="budget-progress">
+        <div class="progress-info">
+          <span>Gastado: ${{ currentSpending.toLocaleString('es-CO') }}</span>
+          <span>Presupuesto: ${{ monthlyBudget.toLocaleString('es-CO') }}</span>
+        </div>
+
+        <ion-progress-bar
+          [value]="percentage / 100"
+          [color]="percentage >= 80 ? 'warning' : 'success'">
+        </ion-progress-bar>
+
+        <div class="percentage">
+          {{ percentage.toFixed(1) }}%
+        </div>
+
+        <div *ngIf="percentage >= 80" class="alert-message">
+          ⚠️ Has alcanzado el {{ percentage.toFixed(1) }}% de tu presupuesto mensual
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
   <app-explore-container name="Summary page"></app-explore-container>
 </ion-content>

@@ -2,22 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton,
-  IonList, IonItem, IonLabel, IonIcon, IonText, IonButtons, ToastController, IonDatetimeButton, IonPopover, IonListHeader
-} from '@ionic/angular/standalone';
+  IonList, IonItem, IonLabel, IonIcon, IonButtons, ToastController, IonListHeader
+} from '@ionic/angular/standalone'; // ← Quitar IonPopover, IonDatetimeButton, IonText si no se usan
 import { ProfileService } from '../../services/profile.service';
 import { ProfileModalComponent } from '../../modals/profile-modal/profile-modal.component';
 import { ModalController } from '@ionic/angular';
-import { personCircleOutline } from 'ionicons/icons';
+import { personCircleOutline, settingsOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Budget } from '../../models/budget.model';
 import { CommonModule } from '@angular/common';
+import { EnvironmentPage } from '../environment/environment.page';
 
 @Component({
   selector: 'app-profile',
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
   standalone: true,
-  imports: [IonListHeader, IonPopover, IonDatetimeButton, IonButtons, IonText,
+  imports: [
+    IonListHeader,
+    IonButtons,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -46,7 +49,7 @@ export class ProfilePage implements OnInit {
     private modalController: ModalController,
     private toastCtrl: ToastController
   ) {
-    addIcons({ personCircleOutline });
+    addIcons({ personCircleOutline, settingsOutline }); // ← Agregar settingsOutline
   }
 
   async ngOnInit() {
@@ -89,7 +92,6 @@ export class ProfilePage implements OnInit {
     await toast.present();
   }
 
-
   // -------- Format --------
   formatCurrency(event: any) {
     let value = event.target.value.replace(/[^\d]/g, '');
@@ -102,7 +104,6 @@ export class ProfilePage implements OnInit {
     this.profileForm.get('amount')?.setValue(formatted);
   }
 
-  // -------- Open modal --------
   async openProfileModal() {
     const modal = await this.modalController.create({
       component: ProfileModalComponent
@@ -115,6 +116,14 @@ export class ProfilePage implements OnInit {
       this.profileForm.get('name')?.setValue(data);
       this.userName = data; // actualizar mensaje en la página
     }
+  }
+
+  async openEnvironmentModal() {
+    const modal = await this.modalController.create({
+      component: EnvironmentPage
+    });
+
+    await modal.present();
   }
 
 }
