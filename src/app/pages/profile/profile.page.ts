@@ -8,7 +8,7 @@ import {
 import { ProfileService } from '../../services/profile.service';
 import { ProfileModalComponent } from '../../modals/profile-modal/profile-modal.component';
 import { ModalController } from '@ionic/angular';
-import { personCircleOutline } from 'ionicons/icons';
+import { personCircleOutline, settingsOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Budget } from '../../models/budget.model';
 import { StorageService } from '../../services/storage.service';
@@ -22,7 +22,9 @@ import { Router } from '@angular/router';
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
   standalone: true,
-  imports: [IonListHeader, IonPopover, IonDatetimeButton, IonButtons, IonText,
+  imports: [
+    IonListHeader,
+    IonButtons,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -129,7 +131,6 @@ export class ProfilePage implements OnInit {
     this.notificationSvc.showSuccess('Presupuesto guardado exitosamente!');
     this.router.navigateByUrl('/tabs/summary')
   }
-
 
   // -------- Format --------
   formatCurrencyIncome(event: any) {

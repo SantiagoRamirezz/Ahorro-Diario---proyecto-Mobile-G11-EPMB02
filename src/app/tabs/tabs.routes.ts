@@ -12,11 +12,6 @@ export const routes: Routes = [
           import('../pages/summary/summary.page').then((m) => m.SummaryPage),
       },
       {
-        path: 'transactions',
-        loadComponent: () =>
-          import('../pages/transactions/transactions.page').then((m) => m.TransactionsPage),
-      },
-      {
         path: 'profile',
         loadComponent: () =>
           import('../pages/profile/profile.page').then((m) => m.ProfilePage),
@@ -30,6 +25,11 @@ export const routes: Routes = [
         path: 'history',
         loadComponent: () =>
           import('../pages/history/history.page').then((m) => m.HistoryPage),
+      },
+      {
+        path: 'environment',
+        loadComponent: () =>
+          import('../pages/environment/environment.page').then((m) => m.EnvironmentPage),
       },
       {
         path: '',

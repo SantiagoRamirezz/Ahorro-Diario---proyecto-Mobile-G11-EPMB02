@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Variables de Entorno</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Agregar Nueva Variable</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Nombre de la Variable</ion-label>
+        <ion-input [(ngModel)]="newKey" placeholder="Ej: API_URL"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Valor</ion-label>
+        <ion-input [(ngModel)]="newValue" placeholder="Ej: https://api.midominio.com"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" (click)="addVariable()" [disabled]="!newKey || !newValue">
+        Agregar Variable
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Variables Configuradas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let variable of variables">
+          <ion-label>
+            <h3>{{ variable.key }}</h3>
+            <p>{{ variable.value }}</p>
+          </ion-label>
+          <ion-buttons slot="end">
+            <ion-button (click)="editVariable(variable)" color="primary">
+              <ion-icon name="pencil"></ion-icon>
+            </ion-button>
+            <ion-button (click)="deleteVariable(variable.key)" color="danger">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+
+        <ion-item *ngIf="variables.length === 0">
+          <ion-label class="ion-text-center">
+            No hay variables configuradas
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
