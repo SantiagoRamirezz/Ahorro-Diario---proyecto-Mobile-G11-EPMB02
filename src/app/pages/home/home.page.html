@@ -1,0 +1,111 @@
+<ion-header [translucent]="true">
+    <ion-toolbar color="primary">
+        <ion-title class="welcome-title">
+            Bienvenido a Ahorro Diario
+        </ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="openEnvironmentModal()">
+                <ion-icon name="settings-outline" color="light"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding" fullscreen="true">
+    <div *ngIf="!wizardVisible" class="landing">
+        <img src="assets/image/money-bag.png" class="money-image" />
+
+        <p class="subtitle">Empecemos a gestionar tus finanzas</p>
+
+        <form [formGroup]="profileForm" class="form-container">
+            <ion-input label="Tu nombre" labelPlacement="floating" formControlName="name"
+                placeholder="Coloque su nombre">
+            </ion-input>
+        </form>
+        <ion-button expand="block" (click)="save()" [disabled]="profileForm.get('name')?.invalid">
+            Crear presupuesto
+        </ion-button>
+    </div>
+
+    <div *ngIf="wizardVisible" class="wizard">
+        <div class="wizard-header">
+            <ion-buttons slot="start">
+                <ion-button (click)="back()" [disabled]="step===1">Volver</ion-button>
+            </ion-buttons>
+            <div class="wizard-title">{{ step===1 ? '¿Qué mes quieres planear?' : step===2 ? 'Registra tus ingresos'
+                :
+                step===3 ? '¿Cuánto quieres ahorrar?' : 'Organiza tus gastos' }}</div>
+            <ion-buttons slot="end">
+                <ion-button (click)="next()" [disabled]="!canContinue() || step===4">Continuar</ion-button>
+            </ion-buttons>
+        </div>
+
+        <div class="wizard-body" [formGroup]="profileForm">
+            <div *ngIf="step===1" class="step step-month">
+                <div class="year-nav">
+                    <ion-button fill="clear" (click)="prevYear()">‹</ion-button>
+                    <div class="year">{{ year }}</div>
+                    <ion-button fill="clear" (click)="nextYear()">›</ion-button>
+                </div>
+                <div class="months">
+                    <ion-chip *ngFor="let m of months; let i = index" (click)="setMonth(i)"
+                        [color]="monthIndex===i ? 'dark' : ''" class="month-chip" [outline]="monthIndex!==i">{{ m
+                        }}</ion-chip>
+                </div>
+            </div>
+
+            <div *ngIf="step===2" class="step step-income">
+                <ion-item>
+                    <ion-input #budgetDesc label="Descripción del presupuesto *" labelPlacement="floating"
+                        formControlName="nameBudget" type="text" clearInput maxlength="60"
+                        autocapitalize="sentences"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-input label="¿Cuánta plata ganarás este mes? *" labelPlacement="floating"
+                        formControlName="income" inputmode="numeric" (ionInput)="formatCurrencyIncome($event)"
+                        type="text" clearInput></ion-input>
+                </ion-item>
+            </div>
+
+            <div *ngIf="step===3" class="step step-saving">
+                <ion-item>
+                    <ion-input label="Ingresa el valor que ahorrarás" labelPlacement="floating" formControlName="saving"
+                        inputmode="numeric" (ionInput)="formatCurrencySaving($event)" type="text"
+                        clearInput></ion-input>
+                </ion-item>
+            </div>
+
+            <div *ngIf="step===4" class="step step-expenses">
+                <div class="totals">
+                    <div class="row">
+                        <div>
+                            <div class="label">Capital del mes</div>
+                            <div class="value">$ {{ remainingAfterSaving() | number }}</div>
+                        </div>
+                        <div>
+                            <div class="label">Ahorro del mes</div>
+                            <div class="value">{{ profileForm.value.saving || ('$ '+ suggestedSaving() |
+                                number:'1.0-0') }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <ion-button expand="block" (click)="saveBudget()"
+                        [disabled]="profileForm.get('income')?.invalid">Guardar
+                        presupuesto</ion-button>
+                    <ion-button expand="block" fill="outline" (click)="step=1">Cancelar</ion-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="wizard-footer">
+            <div class="step-text">Paso {{ step }} de 4</div>
+            <div class="progress">
+                <div class="bar" [style.width.%]="step*25"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</ion-content>
