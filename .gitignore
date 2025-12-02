@@ -68,3 +68,17 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/app/debug/
+android/app/build/outputs/
+android/local.properties
+android/captures/
+android/.idea/
+*.apk
+*.aab
+*.keystore
+*.jks

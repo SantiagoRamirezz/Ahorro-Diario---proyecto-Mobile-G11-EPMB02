@@ -7,7 +7,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ProfileService } from '../../services/profile.service';
 import { ProfileModalComponent } from '../../modals/profile-modal/profile-modal.component';
-import { ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
 import { personCircleOutline, settingsOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { Budget } from '../../models/budget.model';

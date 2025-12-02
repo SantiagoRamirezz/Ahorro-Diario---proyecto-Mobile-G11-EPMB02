@@ -72,6 +72,16 @@ export class HomePage {
             income: ['', [Validators.required, Validators.min(1)]],
             saving: [''],
         });
+        const existingProfileName = await this.profileService.getUserName();
+        const state = await this.storageSvc.getAppState();
+        const stateName = state?.user?.name ?? null;
+        const finalName = existingProfileName ?? stateName ?? null;
+        if (finalName) {
+            this.profileForm.get('name')?.setValue(finalName);
+            state.user = state.user || {};
+            state.user.name = finalName;
+            await this.storageSvc.setAppState(state);
+        }
     }
 
     async save() {

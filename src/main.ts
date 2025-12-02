@@ -9,6 +9,8 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { registerLocaleData } from '@angular/common';
 import localeEsCo from '@angular/common/locales/es-CO';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 registerLocaleData(localeEsCo, 'es-CO');
 
 bootstrapApplication(AppComponent, {
@@ -24,4 +26,10 @@ bootstrapApplication(AppComponent, {
     ),
     { provide: LOCALE_ID, useValue: 'es-CO' },
   ],
+}).then(() => {
+  if (Capacitor.getPlatform() === 'android') {
+    StatusBar.setOverlaysWebView({ overlay: false });
+    StatusBar.setStyle({ style: Style.Dark });
+    StatusBar.setBackgroundColor({ color: '#000000' });
+  }
 });
