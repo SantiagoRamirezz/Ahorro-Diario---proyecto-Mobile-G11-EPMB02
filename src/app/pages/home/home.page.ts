@@ -6,6 +6,8 @@ import {
     IonChip
 } from '@ionic/angular/standalone';
 import { ProfileService } from '../../services/profile.service';
+import { HistorialService } from '../../services/historial.service';
+import { AlertNotificationService } from '../../services/alert-notification.service';
 import { ModalController } from '@ionic/angular';
 import { personCircleOutline, settingsOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
@@ -18,7 +20,7 @@ import { Router } from '@angular/router';
 import { EnvironmentPage } from '../environment/environment.page';
 
 @Component({
-    selector: 'app-history',
+    selector: 'app-home',
     templateUrl: 'home.page.html',
     styleUrls: ['home.page.scss'],
     imports: [IonListHeader,
@@ -39,7 +41,7 @@ import { EnvironmentPage } from '../environment/environment.page';
     ],
     providers: [ModalController, ToastController]
 })
-export class HomePage {
+export class HomePage implements OnInit { // Agregar implements OnInit
 
     profileForm!: FormGroup;
     budgets: Budget[] = [];
@@ -53,16 +55,18 @@ export class HomePage {
     selectedCategories = new Set<string>();
     suggestCategories = false;
 
-
     @ViewChild('budgetDesc') budgetDescInput?: IonInput;
 
-    private fb = inject(FormBuilder)
-    private profileService = inject(ProfileService)
-    private modalController = inject(ModalController)
-    private storageSvc = inject(StorageService)
-    private utilsSvc = inject(UtilsService)
-    private notificationSvc = inject(NotificationService)
-    private router = inject(Router)
+    // CORRECCIÓN: Usar inject() sin comas dentro del constructor
+    private fb = inject(FormBuilder);
+    private profileService = inject(ProfileService);
+    private modalController = inject(ModalController);
+    private storageSvc = inject(StorageService);
+    private utilsSvc = inject(UtilsService);
+    private notificationSvc = inject(NotificationService);
+    private router = inject(Router);
+    private historialService = inject(HistorialService);
+    private alertNotificationService = inject(AlertNotificationService);
 
     async ngOnInit() {
         addIcons({ personCircleOutline, settingsOutline });
@@ -97,13 +101,25 @@ export class HomePage {
         state.user.name = name;
         await this.storageSvc.setAppState(state);
 
+        // REGISTRAR EN HISTORIAL
+        await this.historialService.agregarEntrada(
+            'Usuario registrado',
+            { nombre: name },
+            'home',
+            'configuracion'
+        );
+
+        this.alertNotificationService.crearAlerta(
+            'Usuario Registrado',
+            `Bienvenido ${name}`,
+            'exito',
+            'home',
+            { nombre: name }
+        );
+
         // Continuar con el wizard
         this.startWizard();
     }
-
-
-
-    // -------- Save --------
     async saveBudget() {
         if (this.profileForm.get('income')?.invalid) return;
         const incomeRaw = this.utilsSvc.parseMoneyInt(this.profileForm.value.income);
@@ -120,8 +136,10 @@ export class HomePage {
             amount: spendable,
             formattedAmount
         };
+
         await this.profileService.addBudget(newBudget);
         this.budgets.push(newBudget);
+
         const stateRaw = await this.storageSvc.getAppState();
         const state = stateRaw || {};
         state.user = state.user || {};
@@ -136,12 +154,38 @@ export class HomePage {
             month: this.monthIndex,
             transactions: Array.isArray(state.user?.budget?.transactions) ? state.user.budget.transactions : []
         };
+
         await this.storageSvc.setAppState(state);
+        await this.historialService.agregarEntrada(
+            'Presupuesto creado',
+            {
+                nombre: finalName,
+                ingresos: incomeNum,
+                ahorro: savingNum,
+                presupuesto: spendable,
+                mes: monthName,
+                año: this.year
+            },
+            'home',
+            'presupuesto'
+        );
+
+       this.alertNotificationService.crearAlerta(
+            'Presupuesto Creado',
+            `Presupuesto "${finalName}" creado exitosamente`,
+            'exito',
+            'home',
+            {
+              nombre: finalName,
+              presupuesto: spendable,
+              ahorro: savingNum
+            }
+          );
 
         this.profileForm.reset();
         this.step = 1;
         this.notificationSvc.showSuccess('Presupuesto guardado exitosamente!');
-        this.router.navigateByUrl('/tabs/summary')
+        this.router.navigateByUrl('/tabs/summary');
     }
 
     // -------- Format --------
@@ -150,31 +194,39 @@ export class HomePage {
         const formatted = value ? '$ ' + Number(value).toLocaleString('es-CO') : '';
         this.profileForm.get('income')?.setValue(formatted);
     }
+
     formatCurrencySaving(event: any) {
         let value = (event.target.value || '').replace(/[^\d]/g, '');
         const formatted = value ? '$ ' + Number(value).toLocaleString('es-CO') : '';
         this.profileForm.get('saving')?.setValue(formatted);
     }
+
     suggestedSaving() {
         const raw = (this.profileForm.value.income || '').replace(/[^\d.-]/g, '');
         const val = parseFloat(raw || '0') || 0;
         return Math.round(val * 0.1);
     }
+
     remainingAfterSaving() {
         const inc = this.utilsSvc.parseMoneyInt(this.profileForm.get('income')?.value);
         const sav = this.utilsSvc.parseMoneyInt(this.profileForm.get('saving')?.value);
         return Math.max(inc - sav, 0);
     }
-    next() { this.step = Math.min(this.step + 1, 4) }
+
+    next() { this.step = Math.min(this.step + 1, 4); }
+
     back() {
         if (this.step === 1) {
-            this.wizardVisible = false
-            return
+            this.wizardVisible = false;
+            return;
         }
-        this.step = Math.max(this.step - 1, 1)
+        this.step = Math.max(this.step - 1, 1);
     }
+
     prevYear() { this.year--; }
+
     nextYear() { this.year++; }
+
     setMonth(i: number) {
         this.monthIndex = i;
         this.next();
@@ -184,21 +236,20 @@ export class HomePage {
     }
 
     startWizard() {
-        this.wizardVisible = true
-        this.step = 1
+        this.wizardVisible = true;
+        this.step = 1;
     }
 
     canContinue(): boolean {
-        if (this.step === 1) return true
-        if (this.step === 2) return !this.profileForm.get('income')?.invalid && !this.profileForm.get('nameBudget')?.invalid
-        if (this.step === 3) return this.isSavingValid() && !this.profileForm.get('saving')?.invalid
-        return false
+        if (this.step === 1) return true;
+        if (this.step === 2) return !this.profileForm.get('income')?.invalid && !this.profileForm.get('nameBudget')?.invalid;
+        if (this.step === 3) return this.isSavingValid() && !this.profileForm.get('saving')?.invalid;
+        return false;
     }
 
     isSavingValid(): boolean {
         const inc = this.utilsSvc.parseMoneyInt(this.profileForm.get('income')?.value);
         const sav = this.utilsSvc.parseMoneyInt(this.profileForm.get('saving')?.value);
-
         return sav <= inc;
     }
 
@@ -207,14 +258,54 @@ export class HomePage {
             component: EnvironmentPage
         });
 
+        // REGISTRAR EN HISTORIAL al abrir modal
+        await this.historialService.agregarEntrada(
+            'Modal de entorno abierto',
+            {},
+            'home',
+            'configuracion'
+        );
+
         await modal.present();
     }
 
     toggleCategory(value: string) {
-        if (this.selectedCategories.has(value)) this.selectedCategories.delete(value)
-        else this.selectedCategories.add(value)
-    }
-    openCategories() { this.categoryModalOpen = true }
-    closeCategories() { this.categoryModalOpen = false }
+        if (this.selectedCategories.has(value)) {
+            this.selectedCategories.delete(value);
+        } else {
+            this.selectedCategories.add(value);
 
+            // Registrar selección de categoría en historial
+            this.historialService.agregarEntrada(
+                'Categoría seleccionada',
+                { categoria: value },
+                'home',
+                'configuracion'
+            );
+        }
+    }
+
+    openCategories() {
+        this.categoryModalOpen = true;
+
+        // Registrar apertura de categorías
+        this.historialService.agregarEntrada(
+            'Modal de categorías abierto',
+            {},
+            'home',
+            'configuracion'
+        );
+    }
+
+    closeCategories() {
+        this.categoryModalOpen = false;
+
+        // Registrar cierre de categorías
+        this.historialService.agregarEntrada(
+            'Modal de categorías cerrado',
+            { categoriasSeleccionadas: Array.from(this.selectedCategories) },
+            'home',
+            'configuracion'
+        );
+    }
 }

@@ -1,8 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Historial
-    </ion-title>
+    <ion-title>Historial de Actividades</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="limpiarHistorial()" color="danger" fill="clear">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="filtroModulo" (ionChange)="filtrarPorModulo($event.detail.value)">
+      <ion-segment-button value="todos">
+        <ion-label>Todos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="home">
+        <ion-label>Home</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="transactions">
+        <ion-label>Transacciones</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
@@ -13,5 +30,49 @@
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="History page"></app-explore-container>
+  <div *ngIf="isLoading" class="ion-text-center ion-padding">
+    <p>Cargando historial...</p>
+  </div>
+
+  <!-- Historial List -->
+  <ion-list *ngIf="!isLoading">
+    <ion-item *ngFor="let item of getHistorialFiltrado()">
+      <ion-icon [name]="getIconoModulo(item.modulo)" slot="start" [color]="getColorTipo(item.tipo)"></ion-icon>
+
+      <ion-label>
+        <h2>{{ item.accion }}</h2>
+        <p>{{ formatearFecha(item.fecha) }}</p>
+
+        <!-- Mostrar datos si existen -->
+        <ng-container *ngIf="item.datos">
+          <p *ngIf="item.datos.monto" class="ion-text-wrap">
+            <small><strong>Monto:</strong> ${{ item.datos.monto | number }}</small>
+          </p>
+          <p *ngIf="item.datos.descripcion" class="ion-text-wrap">
+            <small><strong>Descripción:</strong> {{ item.datos.descripcion }}</small>
+          </p>
+          <p *ngIf="item.datos.categoria" class="ion-text-wrap">
+            <small><strong>Categoría:</strong> {{ item.datos.categoria }}</small>
+          </p>
+          <p *ngIf="item.datos.nombre" class="ion-text-wrap">
+            <small><strong>Nombre:</strong> {{ item.datos.nombre }}</small>
+          </p>
+          <p *ngIf="item.datos.ingresos" class="ion-text-wrap">
+            <small><strong>Ingresos:</strong> ${{ item.datos.ingresos | number }}</small>
+          </p>
+        </ng-container>
+      </ion-label>
+
+      <ion-badge slot="end" [color]="getColorTipo(item.tipo)">
+        {{ item.tipo }}
+      </ion-badge>
+    </ion-item>
+
+    <!-- Empty State -->
+    <div *ngIf="getHistorialFiltrado().length === 0 && !isLoading" class="ion-text-center ion-padding">
+      <ion-icon name="time-outline" size="large" color="medium"></ion-icon>
+      <h3>No hay actividades registradas</h3>
+      <p>Las acciones que realices en la app se mostrarán aquí</p>
+    </div>
+  </ion-list>
 </ion-content>

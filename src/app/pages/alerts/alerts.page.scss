@@ -1,0 +1,52 @@
+/* src/app/pages/alerts/alerts.page.scss */
+.notificacion-no-leida {
+  --background: rgba(var(--ion-color-primary-rgb), 0.05);
+  border-left: 4px solid var(--ion-color-primary);
+}
+
+.punto-no-leido {
+  width: 10px;
+  height: 10px;
+  background-color: var(--ion-color-primary);
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+ion-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  ion-icon {
+    font-size: 24px;
+  }
+}
+
+ion-chip {
+  margin: 0;
+  height: 20px;
+  font-size: 0.7rem;
+}
+
+ion-item-sliding {
+  margin-bottom: 1px;
+}
+
+ion-item {
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
+}
+
+ion-label h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+ion-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

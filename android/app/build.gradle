@@ -3,18 +3,6 @@ apply plugin: 'com.android.application'
 android {
     namespace "io.ionic.starter"
     compileSdk rootProject.ext.compileSdkVersion
-    def releaseStoreFile = project.findProperty('RELEASE_STORE_FILE') ?: 'keystore/ahorro-diario-release.keystore'
-    def releaseStorePassword = project.findProperty('RELEASE_STORE_PASSWORD') ?: ''
-    def releaseKeyAlias = project.findProperty('RELEASE_KEY_ALIAS') ?: 'ahorrodiario'
-    def releaseKeyPassword = project.findProperty('RELEASE_KEY_PASSWORD') ?: ''
-    signingConfigs {
-        release {
-            storeFile file(releaseStoreFile)
-            storePassword releaseStorePassword
-            keyAlias releaseKeyAlias
-            keyPassword releaseKeyPassword
-        }
-    }
     defaultConfig {
         applicationId "io.ionic.starter"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -32,7 +20,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 }
