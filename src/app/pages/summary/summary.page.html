@@ -24,6 +24,9 @@
     <ion-card-content>
       <div><strong>Capital del mes:</strong> {{ budgetCapital | number:'1.0-0' }}</div>
       <div><strong>Ahorro del mes:</strong> {{ budgetSaving | number:'1.0-0' }}</div>
+      <div style="margin-top:8px" *ngIf="fromHistory">
+        <ion-button size="small" (click)="goToLatestBudget()">Volver al presupuesto más reciente</ion-button>
+      </div>
     </ion-card-content>
   </ion-card>
 

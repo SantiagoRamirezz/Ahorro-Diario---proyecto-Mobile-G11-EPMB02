@@ -154,6 +154,17 @@ export class HomePage implements OnInit { // Agregar implements OnInit
             month: this.monthIndex,
             transactions: Array.isArray(state.user?.budget?.transactions) ? state.user.budget.transactions : []
         };
+        const key = `${this.year}-${this.monthIndex}`;
+        state.user.budgetsByMonth = state.user.budgetsByMonth || {};
+        state.user.budgetsByMonth[key] = {
+            id: state.user.budget.id,
+            name: state.user.budget.name,
+            salary: state.user.budget.salary,
+            budget_goal: state.user.budget.budget_goal,
+            saving: state.user.budget.saving,
+            year: state.user.budget.year,
+            month: state.user.budget.month
+        };
 
         await this.storageSvc.setAppState(state);
         await this.historialService.agregarEntrada(
@@ -185,7 +196,7 @@ export class HomePage implements OnInit { // Agregar implements OnInit
         this.profileForm.reset();
         this.step = 1;
         this.notificationSvc.showSuccess('Presupuesto guardado exitosamente!');
-        this.router.navigateByUrl('/tabs/summary');
+        this.router.navigate(['/tabs/summary'], { queryParams: { year: this.year, month: this.monthIndex } });
     }
 
     // -------- Format --------

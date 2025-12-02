@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertNotificationService, AlertNotification } from '../../services/alert-notification.service';
 import {
@@ -6,6 +6,8 @@ import {
   IonList, IonItem, IonLabel, IonIcon, IonChip,
   IonNote
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { informationCircleOutline, warningOutline, checkmarkCircleOutline, closeCircleOutline, cashOutline, personOutline, statsChartOutline, timeOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-alerts',
@@ -21,9 +23,10 @@ import {
 export class AlertsPage {
   alertas: AlertNotification[] = [];
 
-  constructor(private alertNotificationService: AlertNotificationService) {}
+  private alertNotificationService = inject(AlertNotificationService);
 
   ionViewWillEnter() {
+    addIcons({ informationCircleOutline, warningOutline, checkmarkCircleOutline, closeCircleOutline, cashOutline, personOutline, statsChartOutline, timeOutline });
     this.cargarAlertas();
   }
 
@@ -53,14 +56,25 @@ export class AlertsPage {
     }
   }
 
+  getIcono(alerta: AlertNotification): string {
+    const byModule: Record<string, string> = {
+      'home': 'person-outline',
+      'transactions': 'cash-outline',
+      'summary': 'stats-chart-outline',
+      'history': 'time-outline'
+    };
+    if (alerta.modulo && byModule[alerta.modulo]) return byModule[alerta.modulo];
+    return alerta.icono || this.getIconoTipo(alerta.tipo);
+  }
+
   getIconoTipo(tipo: string): string {
     const iconos = {
-      'info': 'information-circle',
-      'advertencia': 'warning',
-      'exito': 'checkmark-circle',
-      'error': 'close-circle'
+      'info': 'information-circle-outline',
+      'advertencia': 'warning-outline',
+      'exito': 'checkmark-circle-outline',
+      'error': 'close-circle-outline'
     };
-    return iconos[tipo as keyof typeof iconos] || 'notifications';
+    return iconos[tipo as keyof typeof iconos] || 'notifications-outline';
   }
 
   getColorTipo(tipo: string): string {

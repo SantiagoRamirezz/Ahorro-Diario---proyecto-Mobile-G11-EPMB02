@@ -29,3 +29,17 @@ ion-segment-button {
   --indicator-color: var(--ion-color-primary);
   min-height: 36px;
 }
+
+.segment-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.segment-scroll ion-segment {
+  display: inline-flex;
+  min-width: max-content;
+}
+
+ion-segment-button ion-label {
+  white-space: nowrap;
+}

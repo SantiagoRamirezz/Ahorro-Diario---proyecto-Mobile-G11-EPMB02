@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HistorialService, HistorialItem } from './historial.service';
 
 export interface Notificacion {
@@ -19,7 +19,9 @@ export class NotificationAlertService {
   private readonly NOTIFICACIONES_KEY = 'app_notificaciones';
   private notificaciones: Notificacion[] = [];
 
-  constructor(private historialService: HistorialService) {
+  private historialService = inject(HistorialService);
+
+  constructor() {
     this.cargarNotificaciones();
   }
 

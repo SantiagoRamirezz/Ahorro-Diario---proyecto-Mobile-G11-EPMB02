@@ -9,6 +9,7 @@
   </ion-toolbar>
 
   <ion-toolbar>
+    <div class="segment-scroll">
     <ion-segment [(ngModel)]="filtroModulo" (ionChange)="filtrarPorModulo($event.detail.value)">
       <ion-segment-button value="todos">
         <ion-label>Todos</ion-label>
@@ -19,7 +20,11 @@
       <ion-segment-button value="transactions">
         <ion-label>Transacciones</ion-label>
       </ion-segment-button>
+      <ion-segment-button value="budgets">
+        <ion-label>Mis Presupuestos</ion-label>
+      </ion-segment-button>
     </ion-segment>
+    </div>
   </ion-toolbar>
 </ion-header>
 
@@ -35,20 +40,21 @@
   </div>
 
   <!-- Historial List -->
-  <ion-list *ngIf="!isLoading">
-    <ion-item *ngFor="let item of getHistorialFiltrado()">
+  <ion-list *ngIf="!isLoading && filtroModulo !== 'transactions'">
+    <ion-item *ngFor="let item of getHistorialFiltrado()" (click)="onItemClick(item)" button>
       <ion-icon [name]="getIconoModulo(item.modulo)" slot="start" [color]="getColorTipo(item.tipo)"></ion-icon>
 
       <ion-label>
-        <h2>{{ item.accion }}</h2>
+        <h2 *ngIf="filtroModulo !== 'budgets'">{{ item.accion }}</h2>
+        <h2 *ngIf="filtroModulo === 'budgets'">{{ item.datos?.nombre || item.accion }}</h2>
         <p>{{ formatearFecha(item.fecha) }}</p>
 
         <!-- Mostrar datos si existen -->
         <ng-container *ngIf="item.datos">
-          <p *ngIf="item.datos.monto" class="ion-text-wrap">
+          <p *ngIf="item.datos.monto && filtroModulo !== 'budgets'" class="ion-text-wrap">
             <small><strong>Monto:</strong> ${{ item.datos.monto | number }}</small>
           </p>
-          <p *ngIf="item.datos.descripcion" class="ion-text-wrap">
+          <p *ngIf="item.datos.descripcion && filtroModulo !== 'budgets'" class="ion-text-wrap">
             <small><strong>Descripción:</strong> {{ item.datos.descripcion }}</small>
           </p>
           <p *ngIf="item.datos.categoria" class="ion-text-wrap">
@@ -60,6 +66,12 @@
           <p *ngIf="item.datos.ingresos" class="ion-text-wrap">
             <small><strong>Ingresos:</strong> ${{ item.datos.ingresos | number }}</small>
           </p>
+          <p *ngIf="filtroModulo === 'budgets' && item.datos?.presupuesto" class="ion-text-wrap">
+            <small><strong>Meta:</strong> ${{ item.datos.presupuesto | number }}</small>
+          </p>
+          <p *ngIf="filtroModulo === 'budgets' && (item.datos?.mes || item.datos?.['año'] || item.datos?.anio)" class="ion-text-wrap">
+            <small><strong>Fecha del presupuesto:</strong> {{ item.datos.mes }} {{ item.datos['año'] || item.datos.anio }}</small>
+          </p>
         </ng-container>
       </ion-label>
 
@@ -69,10 +81,37 @@
     </ion-item>
 
     <!-- Empty State -->
-    <div *ngIf="getHistorialFiltrado().length === 0 && !isLoading" class="ion-text-center ion-padding">
+    <div *ngIf="getHistorialFiltrado().length === 0 && !isLoading && filtroModulo !== 'transactions'" class="ion-text-center ion-padding">
       <ion-icon name="time-outline" size="large" color="medium"></ion-icon>
       <h3>No hay actividades registradas</h3>
       <p>Las acciones que realices en la app se mostrarán aquí</p>
     </div>
+  </ion-list>
+
+  <!-- Lista de Transacciones (lazy) -->
+  <ion-list *ngIf="!isLoading && filtroModulo === 'transactions'">
+    <ion-item *ngFor="let t of getVisibleTransactions()">
+      <ion-icon [name]="getIconoCategoria(getCategoryDisplay(t))" slot="start" [color]="t.type === 'income' ? 'success' : 'danger'"></ion-icon>
+      <ion-label>
+        <h2>{{ t.note || 'Sin nota' }}</h2>
+        <p>{{ getCategoryDisplay(t) }}</p>
+        <p><small>{{ getBudgetLabel(t) }}</small></p>
+        <small>{{ formatearFechaSoloDia(t.date) }}</small>
+      </ion-label>
+      <ion-badge slot="end" [color]="t.type === 'income' ? 'success' : 'danger'">
+        {{ t.type === 'income' ? '+' : '-' }}
+      </ion-badge>
+    </ion-item>
+
+    <div *ngIf="getVisibleTransactions().length === 0" class="ion-text-center ion-padding">
+      <ion-icon name="wallet-outline" size="large" color="medium"></ion-icon>
+      <h3>No hay transacciones</h3>
+      <p>Registra ingresos o gastos para verlos aquí</p>
+    </div>
+
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMoreTransactions($event)" [disabled]="getVisibleTransactions().length >= allTransactions.length">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </ion-list>
 </ion-content>

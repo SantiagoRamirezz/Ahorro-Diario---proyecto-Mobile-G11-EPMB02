@@ -20,7 +20,7 @@ import type { TransactionType, Transaction } from '../../models/transaction'
 import { CommonModule } from '@angular/common'
 import { ToastController } from '@ionic/angular'
 import { IonSegment, IonSegmentButton } from '@ionic/angular/standalone'
-import { Router } from '@angular/router'
+import { Router, ActivatedRoute } from '@angular/router'
 import { NotificationService } from 'src/app/services/notification.service'
 import { UtilsService } from 'src/app/services/utils.service'
 
@@ -52,6 +52,7 @@ export class TransactionsPage {
   private fb = inject(FormBuilder)
   private tx = inject(TransactionsService)
   private router = inject(Router)
+  private route = inject(ActivatedRoute)
   private notificationSvc = inject(NotificationService)
   private utilsSvc = inject(UtilsService)
 
@@ -77,6 +78,17 @@ export class TransactionsPage {
 
 
   ionViewWillEnter() {
+    const qp = this.route.snapshot.queryParamMap
+    const y = qp.get('year')
+    const m = qp.get('month')
+    if (y && m) {
+      this.viewYear = Number(y)
+      this.viewMonth = Number(m)
+    } else {
+      const now = new Date()
+      this.viewYear = now.getFullYear()
+      this.viewMonth = now.getMonth()
+    }
     this.load()
   }
 
@@ -87,6 +99,10 @@ export class TransactionsPage {
 
   async submit() {
     if (this.form.invalid) return
+    if (this.isPastBudget()) {
+      this.notificationSvc.showError('No puedes registrar en presupuestos anteriores')
+      return
+    }
     const value = this.form.value
     const d = new Date(value.date!)
     const dateOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate())
@@ -142,5 +158,14 @@ export class TransactionsPage {
     let value = (event.target.value || '').replace(/[^\d]/g, '')
     const formatted = value ? '$ ' + Number(value).toLocaleString('es-CO') : ''
     this.form.get('amount')?.setValue(formatted)
+  }
+
+  private viewYear: number = new Date().getFullYear()
+  private viewMonth: number = new Date().getMonth()
+  private isPastBudget(): boolean {
+    const now = new Date()
+    const selected = new Date(this.viewYear, this.viewMonth, 1)
+    const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    return selected < currentMonth
   }
 }

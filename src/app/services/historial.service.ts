@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { StorageService } from './storage.service';
 
 export interface HistorialItem {
@@ -17,7 +17,9 @@ export class HistorialService {
   private readonly HISTORIAL_KEY = 'app_historial';
   private historial: HistorialItem[] = [];
 
-  constructor(private storageService: StorageService) {
+  private storageService = inject(StorageService);
+
+  constructor() {
     this.cargarHistorial();
   }
 

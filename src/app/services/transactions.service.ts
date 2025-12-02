@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core'
+import { Subject } from 'rxjs'
 import type { Transaction } from '../models/transaction'
 import { StorageService } from './storage.service'
+import { AlertNotificationService } from './alert-notification.service'
 
 const STORAGE_KEY = 'app_state'
 
@@ -11,6 +13,8 @@ function genId(): string {
 @Injectable({ providedIn: 'root' })
 export class TransactionsService {
   private storageSvc = inject(StorageService)
+  private changes$ = new Subject<void>()
+  private alertSvc = inject(AlertNotificationService)
   async getAll(): Promise<Transaction[]> {
     const state = await this.storageSvc.getAppState()
     const arr = state?.user?.budget?.transactions
@@ -38,7 +42,27 @@ export class TransactionsService {
         }
       }
       await this.storageSvc.setAppState(state)
+      const d2 = new Date(item.date)
+      const y2 = d2.getFullYear()
+      const m2 = d2.getMonth()
+      const totals = await this.getTotals(y2, m2)
+      const b = state.user?.budget
+      const saving = Number(b?.saving || 0)
+      const cap = Number(b?.budget_goal || 0)
+      const balance = (cap + totals.income) - totals.expense
+      if (typeof b?.year === 'number' && typeof b?.month === 'number' && b.year === y2 && b.month === m2) {
+        if (balance < saving) {
+          this.alertSvc.crearAlerta(
+            'Meta de ahorro no cumplida',
+            'Tu saldo disponible es inferior a la meta de ahorro planificada.',
+            'advertencia',
+            'transactions',
+            { balance, saving }
+          )
+        }
+      }
     } catch {}
+    this.changes$.next()
     return item
   }
 
@@ -77,5 +101,9 @@ export class TransactionsService {
       map[t.category] = (map[t.category] ?? 0) + t.amount
     }
     return map
+  }
+
+  getChanges() {
+    return this.changes$.asObservable()
   }
 }
